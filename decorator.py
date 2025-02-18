@@ -20,17 +20,14 @@ def reply(func):
            except requests.exceptions.ConnectionError:
                print("Error connection, try again")
                continue
-           except:
-               print("Error")
-               return "Error"
-        return "ConnectionError"
+        raise requests.exceptions.ConnectionError("Возможно нет подключения к интернету.")
     return wrapper
 
 def check_time_func(func):
     def wrapper(*args, time_error=10000, **kwargs):
         answer = timer_func(func)
-        if answer(*args, **kwargs)[1] >= time_error:
-            print("Error timeout")
-            return "Time is over"
-        return answer(*args, **kwargs)[0]
+        result = answer(*args, **kwargs)
+        if result[1] >= time_error:
+            raise TimeoutError("Функция выполнялась дольше указаного")
+        return result[0]
     return wrapper
