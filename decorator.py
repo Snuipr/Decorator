@@ -1,6 +1,7 @@
 import time
 import requests
 
+
 def timer_func(func):
     def wrapper(*args) -> list:
         start_time = time.time()
@@ -10,17 +11,19 @@ def timer_func(func):
         print(f"Время работы: {times}")
         return [result, times]
     return wrapper
-    
+
 def reply(func):
     def wrapper(*args, repit=1, **kwargs):
+        error = None
         for i in range(repit):
            try:
                 responce = func(*args, **kwargs)
                 return responce
-           except:
+           except Exception as e:
+               error = e
                print("Error, try again")
                continue
-        raise Exception(f"Функция не заработала за {repit} попыток")
+        raise error
     return wrapper
 
 def check_time_func(func):
@@ -28,6 +31,6 @@ def check_time_func(func):
         answer = timer_func(func)
         result = answer(*args, **kwargs)
         if result[1] >= time_error:
-            raise TimeoutError("Функция выполнялась дольше указаного")
+            raise TimeoutError(f"Функция выполнялась: {result[1]} дольше: {time_error}")
         return result[0]
     return wrapper
